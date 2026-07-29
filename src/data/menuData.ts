@@ -9,7 +9,7 @@ import capuccinoCream from "@/assets/capuccino-cream.png";
 import pinkLemonade from "@/assets/pink-lemonade.png";
 import espressoItaliano from "@/assets/espresso-italiano.png";
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'https://elitehookah.onrender.com/api';
 
 export const API = {
   async post(path: string, data: any) { 
@@ -41,6 +41,14 @@ export interface SelectedAddon {
   quantity: number;
 }
 
+export interface KitItem {
+  id: string;
+  name: string;
+  price: number;
+  image?: string;
+  quantity: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -49,7 +57,7 @@ export interface Product {
   image: string;
   images?: string[];
   category: string;
-  brand?: string; // NOVO CAMPO: Marca da essência (ex: Zomo, Ziggy)
+  brand?: string;
   addons: Addon[];
   isPromo: boolean;
   originalPrice?: number;
@@ -57,6 +65,7 @@ export interface Product {
   promoStock?: number;
   orderCount: number;
   isMadeToOrder?: boolean;
+  kitItems?: KitItem[];
 }
 
 export interface CartItem {
@@ -474,6 +483,18 @@ export async function saveCoupon(coupon: any) {
   return API.post('/coupons', coupon);
 }
 
-export async function deleteCoupon(id: string) {
+export async function deleteCoupon(id: number) {
   return API.del(`/coupons/${id}`);
+}
+
+// ── Brands ──
+export async function fetchBrands(): Promise<string[]> {
+  try {
+    const res = await fetch(`${API_URL}/brands`);
+    if (!res.ok) throw new Error('Falha ao buscar marcas');
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
 }

@@ -11,7 +11,7 @@ import {
   getProducts, saveProducts, getCategories, saveCategories,
   getAddons, saveAddons, getOrders, updateOrderStatus,
   fetchProducts, fetchCategories, fetchAddons, fetchOrders, API,
-  fetchLoyaltySettings, saveLoyaltySettings, fetchStoreSettings, saveStoreSettings, fetchCoupons
+  fetchLoyaltySettings, saveLoyaltySettings, fetchStoreSettings, saveStoreSettings, fetchCoupons, fetchBrands
 } from "@/data/menuData";
 import type { Product, Addon, Category, Order, OrderStatus, LoyaltySettings, StoreSettings } from "@/data/menuData";
 import AdminCoupons from "./AdminCoupons";
@@ -58,6 +58,7 @@ export default function Admin() {
   const { data: addons = [], refetch: refetchAddons } = useQuery({ queryKey: ['addons'], queryFn: fetchAddons });
   const { data: orders = [], refetch: refetchOrders } = useQuery({ queryKey: ['orders'], queryFn: fetchOrders });
   const { data: coupons = [] } = useQuery({ queryKey: ['coupons'], queryFn: fetchCoupons });
+  const { data: brands = [], refetch: refetchBrands } = useQuery({ queryKey: ['brands'], queryFn: fetchBrands });
   const [activeTab, setActiveTab] = useState<"orders" | "products" | "categories" | "addons" | "promos" | "loyalty" | "settings" | "coupons" | "reports" | "couriers" | "pdv">("orders");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -90,6 +91,7 @@ export default function Admin() {
   const [formAddons, setFormAddons] = useState<string[]>([]);
   const [formIsMadeToOrder, setFormIsMadeToOrder] = useState(false);
   const [formBrand, setFormBrand] = useState("");
+  const [isNewBrand, setIsNewBrand] = useState(false);
 
   // Loyalty form
   const [loyaltyData, setLoyaltyData] = useState<LoyaltySettings | null>(null);
@@ -149,7 +151,7 @@ export default function Admin() {
     setFormName(""); setFormDesc(""); setFormPrice("");
     setFormCategory(categories[0]?.id || "frango");
     setFormImages([]); setFormIsPromo(false); setFormOriginalPrice(""); setFormPromoExpiry(""); setFormPromoStock(""); setFormAddons([]);
-    setFormIsMadeToOrder(false); setFormBrand("");
+    setFormIsMadeToOrder(false); setFormBrand(""); setIsNewBrand(false);
     setEditingProduct(null); setShowForm(false);
   };
 
@@ -165,6 +167,7 @@ export default function Admin() {
     setFormAddons(product.addons.map((a) => a.id));
     setFormIsMadeToOrder(product.isMadeToOrder || false);
     setFormBrand(product.brand || "");
+    setIsNewBrand(false);
     setShowForm(true);
   };
 
@@ -200,6 +203,7 @@ export default function Admin() {
       }
     }
     await refetchProducts();
+    await refetchBrands();
     resetForm();
   };
 
@@ -527,8 +531,31 @@ export default function Admin() {
                     {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
-                <input value={formBrand} onChange={(e) => setFormBrand(e.target.value)} placeholder="Marca (Opcional)"
-                  className="w-full border border-border rounded-lg p-2.5 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                <div className="flex gap-2">
+                  {!isNewBrand ? (
+                    <select value={formBrand} onChange={(e) => {
+                      if (e.target.value === 'NEW') {
+                        setIsNewBrand(true);
+                        setFormBrand("");
+                      } else {
+                        setFormBrand(e.target.value);
+                      }
+                    }}
+                      className="w-full border border-border rounded-lg p-2.5 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                      <option value="">Selecione uma Marca (Opcional)</option>
+                      {brands.map(b => <option key={b} value={b}>{b}</option>)}
+                      <option value="NEW" className="font-bold text-primary">+ Adicionar nova marca</option>
+                    </select>
+                  ) : (
+                    <div className="flex w-full gap-2">
+                      <input value={formBrand} onChange={(e) => setFormBrand(e.target.value)} placeholder="Nova Marca"
+                        className="w-full border border-border rounded-lg p-2.5 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                      <button type="button" onClick={() => { setIsNewBrand(false); setFormBrand(""); }} className="p-2.5 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {/* Upload de Imagens */}
                 <div className="space-y-2 border border-border rounded-lg p-3 bg-muted/20">

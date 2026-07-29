@@ -75,6 +75,17 @@ const saveBase64Image = async (base64Str) => {
   return `/uploads/${filename}`;
 };
 
+// ── Brands ──
+app.get('/api/brands', async (req, res) => {
+  try {
+    const [brands] = await db.query('SELECT DISTINCT brand FROM products WHERE brand IS NOT NULL AND brand != "" ORDER BY brand ASC');
+    res.json(brands.map(b => b.brand));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar marcas' });
+  }
+});
+
 // ── Categories ──
 app.get('/api/categories', async (req, res) => {
   try {
@@ -212,6 +223,12 @@ app.get('/api/products', async (req, res) => {
       SELECT * FROM product_images
     `);
 
+    const [kitItemsRows] = await db.query(`
+      SELECT pki.kit_id, pki.quantity, p.id, p.name, p.price, p.image
+      FROM product_kit_items pki
+      JOIN products p ON pki.product_id = p.id
+    `);
+
     const formattedProducts = products.map(p => {
       const addons = productAddonsRows
         .filter(pa => pa.product_id === p.id)
@@ -224,6 +241,16 @@ app.get('/api/products', async (req, res) => {
       const images = productImagesRows
         .filter(img => img.product_id === p.id)
         .map(img => img.image_url);
+
+      const kitItems = kitItemsRows
+        .filter(k => k.kit_id === p.id)
+        .map(k => ({
+          id: k.id,
+          name: k.name,
+          price: Number(k.price),
+          image: k.image,
+          quantity: k.quantity
+        }));
 
       return {
         id: p.id,
@@ -240,7 +267,8 @@ app.get('/api/products', async (req, res) => {
         promoExpiry: p.promo_expiry,
         promoStock: p.promo_stock,
         orderCount: p.order_count,
-        isMadeToOrder: Boolean(p.is_made_to_order)
+        isMadeToOrder: Boolean(p.is_made_to_order),
+        kitItems: kitItems.length ? kitItems : undefined
       };
     });
 
@@ -252,7 +280,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-  const { id, name, description, price, image, images, category, brand, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder } = req.body;
+  const { id, name, description, price, image, images, category, brand, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder, kitItems } = req.body;
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
@@ -279,6 +307,12 @@ app.post('/api/products', async (req, res) => {
         await connection.query('INSERT INTO product_addons (product_id, addon_id) VALUES (?, ?)', [id, a.id]);
       }
     }
+    
+    if (kitItems && kitItems.length > 0) {
+      for (const item of kitItems) {
+        await connection.query('INSERT INTO product_kit_items (kit_id, product_id, quantity) VALUES (?, ?, ?)', [id, item.id, item.quantity || 1]);
+      }
+    }
     await connection.commit();
     res.status(201).json({ message: 'Produto criado com sucesso' });
   } catch (error) {
@@ -291,7 +325,7 @@ app.post('/api/products', async (req, res) => {
 });
 
 app.put('/api/products/:id', async (req, res) => {
-  const { name, description, price, image, images, category, brand, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder } = req.body;
+  const { name, description, price, image, images, category, brand, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder, kitItems } = req.body;
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
@@ -321,6 +355,14 @@ app.put('/api/products/:id', async (req, res) => {
         await connection.query('INSERT INTO product_addons (product_id, addon_id) VALUES (?, ?)', [req.params.id, a.id]);
       }
     }
+
+    await connection.query('DELETE FROM product_kit_items WHERE kit_id = ?', [req.params.id]);
+    if (kitItems && kitItems.length > 0) {
+      for (const item of kitItems) {
+        await connection.query('INSERT INTO product_kit_items (kit_id, product_id, quantity) VALUES (?, ?, ?)', [req.params.id, item.id, item.quantity || 1]);
+      }
+    }
+
     await connection.commit();
     res.json({ message: 'Atualizado com sucesso' });
   } catch (error) {
