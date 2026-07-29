@@ -8,6 +8,7 @@ import path from 'path';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import webpush from 'web-push';
+import crypto from 'crypto';
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey';
@@ -592,11 +593,15 @@ app.post('/api/orders', async (req, res) => {
     await connection.beginTransaction();
     
     // extrai dados do body baseado no formato do mock (Order)
-    const { 
+    let { 
       id, number, consumeType, paymentMethod, address, mesa, 
       customerWhatsApp, customerCPF, status, total, items, timeline,
       usedPoints, discountAmount, customerName, changeNeededFor, deliveryFee, couponId, courierId, origin
     } = req.body;
+
+    if (!id) {
+      id = crypto.randomUUID();
+    }
 
     // Verificar se a loja está aberta
     const [settingsRowsCheck] = await connection.query('SELECT is_open FROM store_settings WHERE id = 1');
