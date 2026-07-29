@@ -24,7 +24,7 @@ export default function PopularSection({ products, onSelect }: Props) {
     <div className="mt-3 mb-3">
       <div className="flex items-center justify-between px-3 mb-2">
         <h2 className="text-lg font-display text-foreground flex items-center gap-1.5">
-          <Star className="text-accent fill-accent" size={18} />
+          <Star className="text-orange-500 fill-orange-500" size={18} />
           Mais Pedidos
         </h2>
         <div className="flex gap-1">
@@ -70,7 +70,7 @@ export default function PopularSection({ products, onSelect }: Props) {
                   Sob Encomenda
                 </span>
               ) : (
-                <span className="absolute top-1.5 left-1.5 bg-accent text-accent-foreground text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                <span className="absolute top-1.5 left-1.5 bg-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm shadow-orange-500/30">
                   <Star size={9} className="fill-current" />
                   Mais Pedido
                 </span>
@@ -92,7 +92,7 @@ export default function PopularSection({ products, onSelect }: Props) {
                   className={`text-[10px] font-bold px-2.5 py-1 rounded-full active:scale-95 transition-transform ${
                     p.isMadeToOrder
                       ? "bg-amber-500 text-white"
-                      : "bg-accent text-accent-foreground"
+                      : "bg-orange-500 text-white shadow-sm shadow-orange-500/20"
                   }`}
                 >
                   {p.isMadeToOrder ? "Encomendar" : "+ Pedir"}

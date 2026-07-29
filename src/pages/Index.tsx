@@ -5,6 +5,7 @@ import type { Product } from "@/data/menuData";
 import HeroHeader from "@/components/menu/HeroHeader";
 import PromoCarousel from "@/components/menu/PromoCarousel";
 import CategoryNav from "@/components/menu/CategoryNav";
+import KitsSection from "@/components/menu/KitsSection";
 import PopularSection from "@/components/menu/PopularSection";
 import ProductCard from "@/components/menu/ProductCard";
 import ProductModal from "@/components/menu/ProductModal";
@@ -12,6 +13,7 @@ import FloatingCart from "@/components/menu/FloatingCart";
 import CheckoutModal from "@/components/menu/CheckoutModal";
 import BottomNav from "@/components/menu/BottomNav";
 import WhatsAppButton from "@/components/menu/WhatsAppButton";
+import BrandSection from "@/components/menu/BrandSection";
 
 const Index = () => {
   const { data: products = [] } = useQuery({ queryKey: ['products'], queryFn: fetchProducts });
@@ -34,21 +36,30 @@ const Index = () => {
       <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
         <PromoCarousel products={products} onSelect={setSelectedProduct} />
         <PopularSection products={products} onSelect={setSelectedProduct} />
+        
+        <KitsSection 
+          products={products.filter((p) => p.category === "kits")} 
+          onSelect={setSelectedProduct} 
+        />
 
         <CategoryNav active={activeCategory} onSelect={setActiveCategory} />
 
-        <div className="px-3 sm:px-0 mt-4 md:mt-8">
-          <h2 className="text-xl md:text-2xl font-display text-foreground mb-4">
-            {activeCategory === "todos"
-              ? "Cardápio Completo"
-              : activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
-            {filteredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} onSelect={setSelectedProduct} />
-            ))}
+          <div className="px-3 sm:px-0 mt-4 md:mt-8">
+            <h2 className="text-xl md:text-2xl font-display text-foreground mb-4">
+              {activeCategory === "todos"
+                ? "Cardápio Completo"
+                : activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}
+            </h2>
+            {activeCategory === "essencias" ? (
+              <BrandSection products={filteredProducts} onSelect={setSelectedProduct} />
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
+                {filteredProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} onSelect={setSelectedProduct} />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
       </div>
 
       <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />

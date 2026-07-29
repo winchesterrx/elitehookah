@@ -13,10 +13,10 @@ export default function ProductCard({ product, onSelect }: Props) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="bg-card rounded-2xl shadow-card overflow-hidden cursor-pointer active:scale-[0.97] transition-all"
+      className="bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-1 border border-slate-100 overflow-hidden cursor-pointer active:scale-[0.97] transition-all duration-300"
       onClick={() => onSelect(product)}
     >
-      <div className="h-32 bg-muted relative overflow-hidden">
+      <div className="h-40 bg-muted relative overflow-hidden">
         {product.image ? (
           <img
             src={product.image}
@@ -57,7 +57,7 @@ export default function ProductCard({ product, onSelect }: Props) {
               e.stopPropagation();
               onSelect(product);
             }}
-            className={`text-[10px] font-bold px-2.5 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-0.5 ${product.isMadeToOrder ? 'bg-amber-500 text-white' : 'bg-accent text-accent-foreground'}`}
+            className={`text-[10px] font-bold px-2.5 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-0.5 ${product.isMadeToOrder ? 'bg-amber-500 text-white' : 'bg-orange-500 text-white shadow-sm shadow-orange-500/20'}`}
           >
             {product.isMadeToOrder ? (
               <><Info size={10} /> Encomendar</>
@@ -70,3 +70,4 @@ export default function ProductCard({ product, onSelect }: Props) {
     </motion.div>
   );
 }
+

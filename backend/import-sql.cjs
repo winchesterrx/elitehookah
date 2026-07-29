@@ -8,14 +8,16 @@ async function importDatabase() {
   try {
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      multipleStatements: true
+      multipleStatements: true,
+      ssl: { rejectUnauthorized: false }
     });
 
     console.log('Conexão estabelecida com sucesso!');
-    const sqlPath = path.resolve(__dirname, '../appcardapio.sql');
+    const sqlPath = path.resolve(__dirname, 'schema_fixed.sql');
     const sqlContent = fs.readFileSync(sqlPath, 'utf8');
 
     console.log('Executando appcardapio.sql remotamente, isso pode levar alguns segundos...');

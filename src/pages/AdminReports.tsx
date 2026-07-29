@@ -238,7 +238,7 @@ export default function AdminReports() {
         <div className="bg-card border border-border p-5 rounded-xl shadow-sm flex flex-col justify-between">
           <div className="flex justify-between items-start mb-2">
              <p className="text-sm text-muted-foreground font-medium">Total de Pedidos</p>
-             <div className="h-8 w-8 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+             <div className="h-8 w-8 rounded-full bg-slate-500/10 flex items-center justify-center text-slate-500">
                <ShoppingBag size={18} />
              </div>
           </div>
@@ -446,3 +446,4 @@ export default function AdminReports() {
     </div>
   );
 }
+

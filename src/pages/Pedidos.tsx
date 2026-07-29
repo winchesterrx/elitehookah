@@ -24,7 +24,7 @@ const statusConfig: Record<OrderStatus, { label: string; icon: React.ElementType
   confirmado: { label: "Confirmado", icon: CheckCircle2, color: "text-cyan-500 bg-cyan-500/10" },
   preparando: { label: "Preparando", icon: Clock, color: "text-amber-500 bg-amber-500/10" },
   pronto: { label: "Pronto", icon: Package, color: "text-emerald-500 bg-emerald-500/10" },
-  despachado: { label: "A Caminho", icon: Bike, color: "text-purple-500 bg-purple-500/10" },
+  despachado: { label: "A Caminho", icon: Bike, color: "text-slate-500 bg-slate-500/10" },
   entregue: { label: "Entregue", icon: Truck, color: "text-muted-foreground bg-muted" },
   cancelado: { label: "Cancelado", icon: XCircle, color: "text-destructive bg-destructive/10" },
 };
@@ -220,20 +220,20 @@ export default function Pedidos() {
 
                   {/* Courier Animation & Name */}
                   {order.status === "despachado" && (
-                    <div className="bg-purple-50 p-4 rounded-xl border border-purple-100 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-100/50 to-transparent animate-shimmer -translate-x-full" />
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/50 to-transparent animate-shimmer -translate-x-full" />
                       <div className="flex items-center gap-3 relative z-10">
-                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 animate-bounce">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 animate-bounce">
                           <Bike size={24} />
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-purple-800">Pedido a caminho!</p>
+                          <p className="text-sm font-bold text-slate-800">Pedido a caminho!</p>
                           {order.courierName && (
-                            <p className="text-xs text-purple-600 font-medium">Entregador: {order.courierName}</p>
+                            <p className="text-xs text-slate-600 font-medium">Entregador: {order.courierName}</p>
                           )}
                         </div>
                       </div>
-                      <div className="absolute -bottom-2 -left-2 text-purple-200/50 opacity-20 transform -rotate-12 pointer-events-none">
+                      <div className="absolute -bottom-2 -left-2 text-slate-200/50 opacity-20 transform -rotate-12 pointer-events-none">
                         <Truck size={64} />
                       </div>
                     </div>
@@ -306,3 +306,4 @@ export default function Pedidos() {
 function isCancelled(order: Order): boolean {
   return order.status === "cancelado";
 }
+

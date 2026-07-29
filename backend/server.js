@@ -233,6 +233,7 @@ app.get('/api/products', async (req, res) => {
         image: p.image,
         images: images.length ? images : (p.image ? [p.image] : []),
         category: p.category_id,
+        brand: p.brand,
         addons: addons,
         isPromo: Boolean(p.is_promo),
         originalPrice: p.original_price ? Number(p.original_price) : undefined,
@@ -251,7 +252,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-  const { id, name, description, price, image, images, category, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder } = req.body;
+  const { id, name, description, price, image, images, category, brand, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder } = req.body;
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
@@ -263,8 +264,8 @@ app.post('/api/products', async (req, res) => {
     const formattedPromoExpiry = promoExpiry ? new Date(promoExpiry).toISOString().slice(0, 19).replace('T', ' ') : null;
 
     await connection.query(
-      'INSERT INTO products (id, name, description, price, image, category_id, is_promo, original_price, promo_expiry, promo_stock, is_made_to_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [id, name, description, price, mainImage, category, isPromo, originalPrice || null, formattedPromoExpiry, promoStock !== undefined ? promoStock : null, isMadeToOrder || false]
+      'INSERT INTO products (id, name, description, price, image, category_id, brand, is_promo, original_price, promo_expiry, promo_stock, is_made_to_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [id, name, description, price, mainImage, category, brand || null, isPromo, originalPrice || null, formattedPromoExpiry, promoStock !== undefined ? promoStock : null, isMadeToOrder || false]
     );
     
     if (savedImages && savedImages.length > 0) {
@@ -290,7 +291,7 @@ app.post('/api/products', async (req, res) => {
 });
 
 app.put('/api/products/:id', async (req, res) => {
-  const { name, description, price, image, images, category, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder } = req.body;
+  const { name, description, price, image, images, category, brand, isPromo, originalPrice, promoExpiry, promoStock, addons, isMadeToOrder } = req.body;
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
@@ -302,8 +303,8 @@ app.put('/api/products/:id', async (req, res) => {
     const formattedPromoExpiry = promoExpiry ? new Date(promoExpiry).toISOString().slice(0, 19).replace('T', ' ') : null;
 
     await connection.query(
-      'UPDATE products SET name = ?, description = ?, price = ?, image = ?, category_id = ?, is_promo = ?, original_price = ?, promo_expiry = ?, promo_stock = ?, is_made_to_order = ? WHERE id = ?',
-      [name, description, price, mainImage, category, isPromo, originalPrice || null, formattedPromoExpiry, promoStock !== undefined ? promoStock : null, isMadeToOrder || false, req.params.id]
+      'UPDATE products SET name = ?, description = ?, price = ?, image = ?, category_id = ?, brand = ?, is_promo = ?, original_price = ?, promo_expiry = ?, promo_stock = ?, is_made_to_order = ? WHERE id = ?',
+      [name, description, price, mainImage, category, brand || null, isPromo, originalPrice || null, formattedPromoExpiry, promoStock !== undefined ? promoStock : null, isMadeToOrder || false, req.params.id]
     );
     
     // Deleta as imagens antigas e re-insere
@@ -768,10 +769,10 @@ const initDbSettings = async () => {
         \`accepts_pix\` TINYINT DEFAULT 1,
         \`accepts_cash\` TINYINT DEFAULT 1,
         \`accepts_card\` TINYINT DEFAULT 1,
-        \`opening_time\` VARCHAR(5) DEFAULT "10:00",
-        \`closing_time\` VARCHAR(5) DEFAULT "22:00",
+        \`opening_time\` VARCHAR(5) DEFAULT '10:00',
+        \`closing_time\` VARCHAR(5) DEFAULT '22:00',
         \`delivery_fee\` DECIMAL(10,2) DEFAULT 0.00,
-        \`delivery_info_text\` VARCHAR(255) DEFAULT "Entregas apenas depois das 14:00"
+        \`delivery_info_text\` VARCHAR(255) DEFAULT 'Entregas apenas depois das 14:00'
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
     await db.query(`

@@ -36,9 +36,9 @@ export default function CategoryNav({ active, onSelect }: Props) {
       >
         <button
           onClick={() => onSelect("todos")}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
             active === "todos"
-              ? "bg-primary text-primary-foreground shadow-card"
+              ? "bg-orange-500 text-white shadow-card shadow-orange-500/20"
               : "bg-muted text-muted-foreground active:bg-muted/70"
           }`}
         >
@@ -51,9 +51,9 @@ export default function CategoryNav({ active, onSelect }: Props) {
             <button
               key={cat.id}
               onClick={() => onSelect(cat.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 active === cat.id
-                  ? "bg-primary text-primary-foreground shadow-card"
+                  ? "bg-orange-500 text-white shadow-card shadow-orange-500/20"
                   : "bg-muted text-muted-foreground active:bg-muted/70"
               }`}
             >

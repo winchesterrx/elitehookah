@@ -49,6 +49,7 @@ export interface Product {
   image: string;
   images?: string[];
   category: string;
+  brand?: string; // NOVO CAMPO: Marca da essência (ex: Zomo, Ziggy)
   addons: Addon[];
   isPromo: boolean;
   originalPrice?: number;
@@ -110,19 +111,22 @@ export interface Order {
 
 // ── Categories ──
 export const defaultCategories: Category[] = [
-  { id: "docinhos", name: "Docinhos Gourmet", icon: "ice-cream" },
-  { id: "bolos", name: "Bolos & Tortas", icon: "cake-slice" },
-  { id: "copos", name: "Copos da Felicidade", icon: "crown" },
-  { id: "bebidas", name: "Cafés & Bebidas", icon: "coffee" },
+  { id: "kits", name: "Kits / Combos", icon: "gift" },
+  { id: "essencias", name: "Essências", icon: "flame" },
+  { id: "carvoes", name: "Carvões", icon: "package" },
+  { id: "aluminio", name: "Papel Alumínio", icon: "disc" },
+  { id: "narguiles", name: "Narguiles", icon: "coffee" },
+  { id: "outros", name: "Outros", icon: "plus-circle" },
 ];
 
-const CATEGORIES_KEY = "digitalmenu_categories_v1";
+const CATEGORIES_KEY = "digitalmenu_categories_v2";
 
 export function getCategories(): Category[] {
   const stored = localStorage.getItem(CATEGORIES_KEY);
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fallback */ }
   }
+  localStorage.removeItem("digitalmenu_categories_v1");
   localStorage.setItem(CATEGORIES_KEY, JSON.stringify(defaultCategories));
   return defaultCategories;
 }
@@ -144,20 +148,17 @@ export async function fetchCategories(): Promise<Category[]> {
 
 // ── Addons ──
 export const defaultAddons: Addon[] = [
-  { id: "nutella", name: "Nutella Extra", price: 4.0, categoryIds: ["docinhos", "bolos", "copos"] },
-  { id: "morango", name: "Morango Extra", price: 3.0, categoryIds: ["docinhos", "bolos", "copos"] },
-  { id: "leite-ninho", name: "Leite Ninho Extra", price: 2.0, categoryIds: ["docinhos", "bolos", "copos"] },
-  { id: "kinder-bueno", name: "Kinder Bueno Extra", price: 5.0, categoryIds: ["bolos", "copos"] },
-  { id: "calda-caramelo", name: "Calda de Caramelo", price: 1.5, categoryIds: ["bolos", "copos", "bebidas"] },
+  { id: "gelo", name: "Gelo", price: 2.0, categoryIds: ["essencias", "outros"] },
 ];
 
-const ADDONS_KEY = "digitalmenu_addons_v1";
+const ADDONS_KEY = "digitalmenu_addons_v2";
 
 export function getAddons(): Addon[] {
   const stored = localStorage.getItem(ADDONS_KEY);
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fallback */ }
   }
+  localStorage.removeItem("digitalmenu_addons_v1");
   localStorage.setItem(ADDONS_KEY, JSON.stringify(defaultAddons));
   return defaultAddons;
 }
@@ -182,30 +183,42 @@ export function getAddonsForCategory(categoryId: string): Addon[] {
 }
 
 // ── Products ──
-const imageMap: Record<string, string> = {
-  "1": brigadeiroGourmet, "2": beijinhoTrufado, "3": coxinhaMorango, "4": boloPoteNinho,
-  "5": boloPoteCenoura, "6": copoFelicidade, "7": croissantDoce, "8": capuccinoCream,
-  "9": pinkLemonade, "10": espressoItaliano,
-};
+const imageMap: Record<string, string> = {};
 
 export const defaultProducts: Product[] = [
-  { id: "1", name: "Brigadeiro Gourmet Belga", description: "Brigadeiro tradicional feito com cacau belga 54% e granulado nobre", price: 4.5, image: brigadeiroGourmet, category: "docinhos", addons: defaultAddons.slice(0, 3), isPromo: true, orderCount: 412 },
-  { id: "2", name: "Beijinho Trufado", description: "Doce de coco com textura cremosa e cobertura de coco ralado fino", price: 4.5, image: beijinhoTrufado, category: "docinhos", addons: defaultAddons.slice(0, 3), isPromo: false, orderCount: 289 },
-  { id: "3", name: "Coxinha de Morango", description: "Morango inteiro fresco envolto em brigadeiro gourmet de leite ninho", price: 8.0, image: coxinhaMorango, category: "docinhos", addons: defaultAddons.slice(0, 3), isPromo: true, orderCount: 384 },
-  { id: "4", name: "Bolo no Pote Ninho com Nutella", description: "Camadas de bolo de chocolate molhadinho com creme de leite Ninho e Nutella pura", price: 15.0, image: boloPoteNinho, category: "bolos", addons: defaultAddons, isPromo: true, orderCount: 512 },
-  { id: "5", name: "Bolo no Pote Cenoura com Brigadeiro", description: "Bolo de cenoura fofinho com uma cobertura generosa de brigadeiro gourmet cremoso", price: 15.0, image: boloPoteCenoura, category: "bolos", addons: defaultAddons, isPromo: false, orderCount: 265 },
-  { id: "6", name: "Copo da Felicidade Supremo", description: "Copo repleto de brigadeiro belga, creme de Ninho, morangos frescos e pedaços de Kinder Bueno", price: 18.0, image: copoFelicidade, category: "copos", addons: defaultAddons, isPromo: true, orderCount: 689 },
-  { id: "7", name: "Croissant de Nutella e Morango", description: "Croissant folhado super crocante recheado com creme de avelã e fatias de morango", price: 16.5, image: croissantDoce, category: "bolos", addons: defaultAddons.slice(0, 3), isPromo: false, orderCount: 145 },
-  { id: "8", name: "Capuccino Cream", description: "Espresso curto servido com leite vaporizado cremoso, chantilly e raspas de chocolate belga", price: 12.0, image: capuccinoCream, category: "bebidas", addons: [defaultAddons[4]], isPromo: false, orderCount: 320 },
-  { id: "9", name: "Pink Lemonade", description: "Bebida refrescante com limão siciliano, água com gás e xarope de frutas vermelhas caseiro", price: 10.0, image: pinkLemonade, category: "bebidas", addons: [], isPromo: false, orderCount: 245 },
-  { id: "10", name: "Espresso Italiano", description: "Café espresso tradicional tirado na hora com grãos selecionados", price: 6.0, image: espressoItaliano, category: "bebidas", addons: [], isPromo: false, orderCount: 189, isMadeToOrder: true },
+  // Zomo
+  { id: "1", name: "Zomo Strong Mint", description: "Menta extremamente refrescante", price: 15.0, image: "/uploads/zomo_mint.png", category: "essencias", brand: "Zomo", addons: defaultAddons, isPromo: false, orderCount: 200 },
+  { id: "2", name: "Zomo Alfajor", description: "Sabor doce do famoso doce argentino", price: 15.0, image: "/uploads/zomo_alfajor.png", category: "essencias", brand: "Zomo", addons: defaultAddons, isPromo: false, orderCount: 150 },
+  { id: "3", name: "Zomo Swiss Alp", description: "Chiclete de menta", price: 15.0, image: "/uploads/zomo_swiss.png", category: "essencias", brand: "Zomo", addons: defaultAddons, isPromo: false, orderCount: 180 },
+  // Ziggy
+  { id: "4", name: "Ziggy Happy Frut", description: "Balinha tutti-frutti", price: 18.0, image: "/uploads/ziggy_happy.png", category: "essencias", brand: "Ziggy", addons: defaultAddons, isPromo: false, orderCount: 300 },
+  { id: "5", name: "Ziggy Tropical", description: "Mix de frutas tropicais", price: 18.0, image: "/uploads/ziggy_tropical.png", category: "essencias", brand: "Ziggy", addons: defaultAddons, isPromo: true, originalPrice: 20.0, orderCount: 250 },
+  // Nay
+  { id: "6", name: "Nay Melon Blend", description: "Melão suave", price: 17.0, image: "/uploads/nay_melon.png", category: "essencias", brand: "Nay", addons: defaultAddons, isPromo: false, orderCount: 90 },
+  { id: "7", name: "Nay Strawberry", description: "Morango intenso", price: 17.0, image: "/uploads/nay_strawberry.png", category: "essencias", brand: "Nay", addons: defaultAddons, isPromo: false, orderCount: 110 },
+  // Onix
+  { id: "8", name: "Onix Grape", description: "Uva gelada", price: 16.0, image: "/uploads/onix_grape.png", category: "essencias", brand: "Onix", addons: defaultAddons, isPromo: false, orderCount: 140 },
+  // Adalya
+  { id: "9", name: "Adalya Love 66", description: "Maracujá, melão, melancia e menta", price: 25.0, image: "/uploads/adalya_love.png", category: "essencias", brand: "Adalya", addons: defaultAddons, isPromo: false, orderCount: 400 },
+  
+  // Carvões
+  { id: "10", name: "Carvão Zomo 1kg", description: "Carvão de coco hexagonal", price: 35.0, image: "/uploads/carvao_zomo.png", category: "carvoes", addons: [], isPromo: false, orderCount: 500 },
+  { id: "11", name: "Carvão Art Coco 1kg", description: "Carvão de coco tradicional", price: 38.0, image: "/uploads/carvao_art.png", category: "carvoes", addons: [], isPromo: false, orderCount: 450 },
+
+  // Alumínio
+  { id: "12", name: "Alumínio Predator 50 un", description: "Folhas pré-cortadas, espessura grossa", price: 15.0, image: "/uploads/alum_predator.png", category: "aluminio", addons: [], isPromo: false, orderCount: 300 },
+  
+  // Narguiles
+  { id: "13", name: "Narguile Triton Zip", description: "Narguile pequeno completo (Cores variadas)", price: 250.0, image: "/uploads/triton.png", category: "narguiles", addons: [], isPromo: false, orderCount: 20 },
 ];
 
-const STORAGE_KEY = "digitalmenu_products_v3";
+const STORAGE_KEY = "digitalmenu_products_v5";
 
 if (typeof window !== "undefined") {
   localStorage.removeItem("digitalmenu_products");
   localStorage.removeItem("digitalmenu_products_v2");
+  localStorage.removeItem("digitalmenu_products_v3");
+  localStorage.removeItem("digitalmenu_products_v4");
 }
 
 const BASE_URL = API_URL.replace(/\/api$/, '');

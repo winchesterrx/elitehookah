@@ -34,7 +34,7 @@ const statusConfig: Record<OrderStatus, { label: string; icon: React.ElementType
   confirmado: { label: "Confirmado", icon: CheckCircle2, color: "text-cyan-500 bg-cyan-500/10" },
   preparando: { label: "Preparando", icon: Clock, color: "text-amber-500 bg-amber-500/10" },
   pronto: { label: "Pronto", icon: Package, color: "text-emerald-500 bg-emerald-500/10" },
-  despachado: { label: "Despachado", icon: Truck, color: "text-purple-500 bg-purple-500/10" },
+  despachado: { label: "Despachado", icon: Truck, color: "text-slate-500 bg-slate-500/10" },
   entregue: { label: "Entregue", icon: CheckCircle2, color: "text-muted-foreground bg-muted" },
   cancelado: { label: "Cancelado", icon: XCircle, color: "text-destructive bg-destructive/10" },
 };
@@ -89,6 +89,7 @@ export default function Admin() {
   const [formPromoStock, setFormPromoStock] = useState("");
   const [formAddons, setFormAddons] = useState<string[]>([]);
   const [formIsMadeToOrder, setFormIsMadeToOrder] = useState(false);
+  const [formBrand, setFormBrand] = useState("");
 
   // Loyalty form
   const [loyaltyData, setLoyaltyData] = useState<LoyaltySettings | null>(null);
@@ -148,7 +149,7 @@ export default function Admin() {
     setFormName(""); setFormDesc(""); setFormPrice("");
     setFormCategory(categories[0]?.id || "frango");
     setFormImages([]); setFormIsPromo(false); setFormOriginalPrice(""); setFormPromoExpiry(""); setFormPromoStock(""); setFormAddons([]);
-    setFormIsMadeToOrder(false);
+    setFormIsMadeToOrder(false); setFormBrand("");
     setEditingProduct(null); setShowForm(false);
   };
 
@@ -163,6 +164,7 @@ export default function Admin() {
     setFormPromoStock(product.promoStock !== undefined && product.promoStock !== null ? product.promoStock.toString() : "");
     setFormAddons(product.addons.map((a) => a.id));
     setFormIsMadeToOrder(product.isMadeToOrder || false);
+    setFormBrand(product.brand || "");
     setShowForm(true);
   };
 
@@ -180,6 +182,7 @@ export default function Admin() {
       promoStock: formPromoStock !== "" ? parseInt(formPromoStock) : undefined,
       orderCount: editingProduct?.orderCount || 0,
       isMadeToOrder: formIsMadeToOrder,
+      brand: formBrand,
     };
     try {
       if (editingProduct) {
@@ -437,7 +440,7 @@ export default function Admin() {
                               <p>💵 **Troco para:** R$ {order.changeNeededFor.toFixed(2)} (Troco a levar: R$ {(order.changeNeededFor - order.total).toFixed(2)})</p>
                             )}
                             {order.courierId && (
-                              <p className="text-purple-600 font-medium">📦 **Entregador:** {couriers.find((c: any) => c.id === order.courierId)?.name || "Desconhecido"}</p>
+                              <p className="text-slate-600 font-medium">📦 **Entregador:** {couriers.find((c: any) => c.id === order.courierId)?.name || "Desconhecido"}</p>
                             )}
                           </div>
 
@@ -524,6 +527,8 @@ export default function Admin() {
                     {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
+                <input value={formBrand} onChange={(e) => setFormBrand(e.target.value)} placeholder="Marca (Opcional)"
+                  className="w-full border border-border rounded-lg p-2.5 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
 
                 {/* Upload de Imagens */}
                 <div className="space-y-2 border border-border rounded-lg p-3 bg-muted/20">
@@ -1046,3 +1051,4 @@ export default function Admin() {
     </div>
   );
 }
+

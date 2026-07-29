@@ -14,10 +14,10 @@ async function run() {
         \`accepts_pix\` TINYINT DEFAULT 1,
         \`accepts_cash\` TINYINT DEFAULT 1,
         \`accepts_card\` TINYINT DEFAULT 1,
-        \`opening_time\` VARCHAR(5) DEFAULT "10:00",
-        \`closing_time\` VARCHAR(5) DEFAULT "22:00",
+        \`opening_time\` VARCHAR(5) DEFAULT '10:00',
+        \`closing_time\` VARCHAR(5) DEFAULT '22:00',
         \`delivery_fee\` DECIMAL(10,2) DEFAULT 0.00,
-        \`delivery_info_text\` VARCHAR(255) DEFAULT "Entregas apenas depois das 14:00"
+        \`delivery_info_text\` VARCHAR(255) DEFAULT 'Entregas apenas depois das 14:00'
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
     console.log("Tabela store_settings verificada/criada.");
